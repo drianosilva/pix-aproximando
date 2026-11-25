@@ -1,0 +1,587 @@
+/* Tokens: os mesmos nomes e valores das variáveis do Figma (Cor, Espaço, Raio)
+   e dos tokens de motion de 03-ui/motion-vibracao-som.md. */
+:root {
+  --fundo-padrao: #ffffff;
+  --fundo-sutil: #f5f5f7;
+  --acao-principal: #3840e0;
+  --acao-principal-pressionada: #2c30bc;
+  --acao-secundaria: #e0ecfc;
+  --acao-secundaria-pressionada: #c9dcf8;
+  --texto-principal: #1a1a1a;
+  --texto-secundario: #737373;
+  --texto-sobre-acao: #ffffff;
+  --texto-acao: #3840e0;
+  --borda-padrao: #c8c8c8;
+  --sucesso: #187018;
+  --sucesso-fundo: #e0f8e0;
+  --info-fundo: #e8f0fc;
+  --pix: #7cd3ff;
+
+  --raio-md: 12px;
+  --raio-lg: 16px;
+  --raio-xl: 24px;
+
+  /* motion: curvas fortes (Emil Kowalski) e durações curtas na interface */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --motion-rapido: 150ms;
+  --motion-base: 250ms;
+
+  --fonte: 'Figtree', system-ui, -apple-system, sans-serif;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; height: 100%; }
+body {
+  font-family: var(--fonte);
+  color: var(--texto-principal);
+  background: var(--fundo-sutil);
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior: none;
+}
+button { font: inherit; color: inherit; border: 0; background: none; padding: 0; cursor: pointer; }
+
+#haptica-ios { position: fixed; left: -100px; top: 0; opacity: 0; pointer-events: none; }
+
+/* ---------- Modo demonstração: dois celulares lado a lado ---------- */
+.palco {
+  min-height: 100dvh;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 24px; padding: 24px;
+}
+.palco-titulo { font-size: 13px; letter-spacing: 0.02em; color: var(--texto-secundario); margin: 0; }
+.dupla { display: flex; gap: 48px; align-items: flex-start; transform-origin: top center; }
+.aparelho-demo { display: flex; flex-direction: column; align-items: center; gap: 16px; transition: transform 500ms var(--ease-in-out); }
+.aparelho-demo .rotulo { font-size: 13px; font-weight: 600; color: var(--texto-secundario); letter-spacing: 0.02em; }
+.moldura {
+  width: 384px; height: 808px; padding: 12px; border-radius: 56px;
+  background: #111; box-shadow: 0 30px 60px -20px rgba(20, 20, 60, 0.35), inset 0 0 0 2px #2a2a2a;
+}
+.moldura .celular { border-radius: 44px; }
+.controles { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+.controle {
+  height: 40px; padding: 0 16px; border-radius: 20px; font-size: 14px; font-weight: 600;
+  background: var(--fundo-padrao); color: var(--texto-principal); box-shadow: 0 1px 0 rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.08);
+  transition: transform var(--motion-rapido) var(--ease-out), background var(--motion-rapido) ease;
+}
+.controle:active { transform: scale(0.97); }
+.controle.principal { background: var(--acao-principal); color: var(--texto-sobre-acao); box-shadow: none; }
+.controle[aria-pressed="false"] { color: var(--texto-secundario); }
+
+/* encostar: os celulares se inclinam um para o outro, topo com topo */
+.encostando .aparelho-demo:first-child { transform: translateX(28px) rotate(6deg); }
+.encostando .aparelho-demo:last-child { transform: translateX(-28px) rotate(-6deg); }
+
+/* ---------- O celular ---------- */
+.celular {
+  position: relative; width: 360px; height: 784px; overflow: hidden;
+  background: var(--fundo-padrao); isolation: isolate;
+  user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+}
+.modo-aparelho .celular { width: 100vw; height: 100dvh; border-radius: 0; }
+.barra-status {
+  height: 32px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between;
+  font-size: 12px; font-weight: 600;
+}
+.barra-status .icones { display: flex; gap: 5px; }
+.barra-status .icones i { display: block; width: 14px; height: 9px; border-radius: 2px; background: var(--texto-principal); }
+.barra-status .icones i:last-child { width: 22px; }
+.modo-aparelho .barra-status { height: env(safe-area-inset-top, 0); padding: 0; }
+.modo-aparelho .barra-status > * { display: none; }
+
+.tela {
+  position: absolute; inset: 32px 0 0 0; display: flex; flex-direction: column;
+  opacity: 0; transform: translateY(8px); pointer-events: none;
+  transition: opacity var(--motion-base) var(--ease-out), transform var(--motion-base) var(--ease-out);
+}
+.modo-aparelho .tela { inset: env(safe-area-inset-top, 0) 0 0 0; padding-bottom: env(safe-area-inset-bottom, 0); }
+.tela.ativa { opacity: 1; transform: none; pointer-events: auto; }
+
+.appbar { height: 56px; display: flex; align-items: center; gap: 12px; padding: 0 16px; font-size: 16px; font-weight: 600; }
+.appbar .icone-botao {
+  width: 40px; height: 40px; border-radius: 12px; background: var(--acao-secundaria); color: var(--texto-acao);
+  display: grid; place-items: center; transition: transform var(--motion-rapido) var(--ease-out);
+}
+.appbar .icone-botao:active { transform: scale(0.94); }
+
+.conteudo { padding: 16px 16px 0; display: flex; flex-direction: column; }
+.titulo-g { font-size: 28px; line-height: 34px; font-weight: 700; letter-spacing: -0.01em; margin: 0; text-wrap: balance; }
+.corpo { font-size: 16px; line-height: 24px; margin: 0; }
+.corpo.sec, .legenda.sec { color: var(--texto-secundario); }
+.legenda { font-size: 13px; line-height: 18px; margin: 0; }
+.rotulo-s { font-size: 12px; line-height: 16px; font-weight: 600; }
+.centro { text-align: center; text-wrap: balance; }
+.espaco { flex: 1; }
+.rodape { padding: 0 16px 16px; display: flex; flex-direction: column; gap: 8px; }
+
+.status-linha { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+.chip-ok {
+  display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px 6px 10px; border-radius: 16px;
+  background: var(--info-fundo); font-size: 12px; font-weight: 600;
+}
+.chip-ok svg { color: var(--sucesso); }
+.timer { font-variant-numeric: tabular-nums; }
+
+.botao {
+  height: 48px; border-radius: 24px; font-size: 16px; font-weight: 600; width: 100%;
+  transition: transform var(--motion-rapido) var(--ease-out), background var(--motion-rapido) ease;
+}
+.botao:active { transform: scale(0.97); }
+.botao.principal { background: var(--acao-principal); color: var(--texto-sobre-acao); }
+.botao.principal:active { background: var(--acao-principal-pressionada); }
+.botao.secundario { background: var(--acao-secundaria); color: var(--texto-acao); }
+.botao.texto { color: var(--texto-acao); }
+
+/* ---------- Busca (pulso) ---------- */
+.busca { position: relative; width: 240px; height: 240px; margin: 16px auto; display: grid; place-items: center; cursor: pointer; }
+.busca .anel {
+  position: absolute; inset: 0; border-radius: 50%; border: 1.5px solid var(--acao-principal);
+  opacity: 0; transform: scale(0.35);
+  animation: pulso 1.6s var(--ease-out) infinite;
+}
+.busca .anel:nth-child(2) { animation-delay: 0.53s; }
+.busca .anel:nth-child(3) { animation-delay: 1.06s; }
+@keyframes pulso {
+  0% { opacity: 0.45; transform: scale(0.35); }
+  100% { opacity: 0; transform: scale(1); }
+}
+.busca .nucleo {
+  position: relative; width: 72px; height: 72px; border-radius: 50%; background: var(--acao-secundaria);
+  display: grid; place-items: center; color: var(--texto-acao);
+}
+
+/* brilho no ponto de contato (topo), na conexão */
+.brilho {
+  position: absolute; left: 50%; top: -60px; width: 320px; height: 140px; margin-left: -160px; z-index: 5;
+  background: radial-gradient(ellipse at center, rgba(56, 64, 224, 0.55), rgba(112, 208, 192, 0.25) 45%, transparent 70%);
+  opacity: 0; transform: scaleX(0.5); pointer-events: none; filter: blur(6px);
+}
+.brilho.acende { animation: brilho 900ms var(--ease-out); }
+@keyframes brilho {
+  0% { opacity: 0; transform: scaleX(0.5); }
+  25% { opacity: 1; transform: scaleX(1); }
+  100% { opacity: 0; transform: scaleX(1.25); }
+}
+
+/* ---------- Cartão de identidade ---------- */
+.cartao {
+  border: 1px solid var(--borda-padrao); border-radius: var(--raio-lg); padding: 16px;
+  display: flex; align-items: center; gap: 12px; margin-top: 12px;
+}
+.avatar {
+  width: 44px; height: 44px; border-radius: 50%; background: var(--acao-secundaria); color: var(--texto-acao);
+  display: grid; place-items: center; font-size: 12px; font-weight: 600; flex: none;
+}
+.cartao .nome { font-weight: 600; font-size: 16px; line-height: 24px; }
+.entra { opacity: 0; transform: translateY(-10px); }
+
+/* ---------- Arrastar para pagar ---------- */
+.trilho {
+  position: relative; height: 232px; border-radius: 32px; margin: 0 16px 16px;
+  background: rgba(224, 236, 252, 0.6); touch-action: none; user-select: none; -webkit-user-select: none;
+}
+.trilho .destino { position: absolute; top: 20px; left: 0; right: 0; text-align: center; color: var(--texto-acao); transition: opacity var(--motion-rapido) ease; }
+.trilho .progresso {
+  position: absolute; left: 8px; right: 8px; bottom: 8px; height: 64px; border-radius: 32px;
+  background: rgba(56, 64, 224, 0.14); transform-origin: bottom; pointer-events: none;
+}
+.trilho .rastro { position: absolute; left: 50%; top: 48px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; color: var(--texto-acao); }
+.trilho .rastro svg { display: block; margin-top: -2px; animation: rastro 1.4s ease-in-out infinite; }
+.trilho .rastro svg:nth-child(1) { animation-delay: 0.3s; }
+.trilho .rastro svg:nth-child(2) { animation-delay: 0.15s; }
+@keyframes rastro { 0%, 100% { opacity: 0.18; } 50% { opacity: 0.6; } }
+.alca {
+  position: absolute; left: 8px; right: 8px; bottom: 8px; height: 64px; border-radius: 32px;
+  background: var(--acao-principal); color: var(--texto-sobre-acao);
+  display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 16px; font-weight: 600;
+  box-shadow: 0 6px 16px rgba(51, 64, 204, 0.25); touch-action: none; will-change: transform; z-index: 3;
+}
+.alca:focus-visible { outline: 3px solid var(--acao-secundaria-pressionada); outline-offset: 3px; }
+.alca .segurar {
+  position: absolute; inset: 0; border-radius: 32px; background: rgba(255,255,255,0.18);
+  clip-path: inset(0 100% 0 0); transition: clip-path 200ms var(--ease-out);
+}
+.alca.segurando .segurar { clip-path: inset(0 0 0 0); transition: clip-path 1s linear; }
+
+/* status de espera (Cristina) */
+.esperando { display: flex; align-items: center; gap: 8px; margin-top: 12px; }
+.girando { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--acao-secundaria); border-top-color: var(--acao-principal); animation: girar 0.8s linear infinite; }
+@keyframes girar { to { transform: rotate(360deg); } }
+.aviso { margin: 0 16px 16px; padding: 16px; border-radius: var(--raio-md); background: var(--info-fundo); display: flex; gap: 12px; align-items: flex-start; }
+.aviso svg { color: var(--texto-acao); flex: none; }
+
+/* ---------- Valor atravessando ---------- */
+.voo {
+  position: absolute; left: 50%; top: 0; z-index: 4; pointer-events: none;
+  display: flex; flex-direction: column; align-items: center; gap: 4px; will-change: transform;
+  white-space: nowrap; text-align: center;
+}
+.voo .valor-grande { font-size: 40px; line-height: 48px; font-weight: 700; letter-spacing: -0.02em; white-space: nowrap; }
+
+/* ---------- Sucesso ---------- */
+.sucesso-bloco { padding: 0 16px; display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
+.check {
+  width: 56px; height: 56px; border-radius: 50%; background: var(--sucesso); color: #fff;
+  display: grid; place-items: center;
+}
+.check path { stroke-dasharray: 30; stroke-dashoffset: 30; }
+.tela.ativa .check path { animation: desenha 260ms 60ms var(--ease-out) forwards; }
+@keyframes desenha { to { stroke-dashoffset: 0; } }
+.tela.ativa .check { animation: aparece 300ms var(--ease-out); }
+@keyframes aparece { from { transform: scale(0.9); } to { transform: scale(1); } }
+
+/* ---------- Vibração visível ---------- */
+.haptica {
+  position: absolute; top: 4px; left: 50%; z-index: 10; pointer-events: none;
+  display: inline-flex; align-items: center; gap: 8px; padding: 5px 12px; border-radius: 14px; white-space: nowrap;
+  background: rgba(26, 26, 26, 0.86); color: #fff; font-size: 12px; font-weight: 600; letter-spacing: 0.01em;
+  opacity: 0; transform: translate(-50%, -6px) scale(0.96);
+  transition: opacity 200ms var(--ease-out), transform 200ms var(--ease-out);
+}
+.haptica.mostra { opacity: 1; transform: translate(-50%, 0) scale(1); transition-duration: 120ms; }
+.haptica .ondas { display: flex; gap: 2px; align-items: center; height: 14px; }
+.haptica .ondas i { display: block; width: 3px; border-radius: 2px; background: var(--pix); }
+.haptica.mostra .ondas i { animation: onda 300ms ease-in-out 2 alternate; }
+.haptica .ondas i:nth-child(2) { animation-delay: 60ms !important; }
+.haptica .ondas i:nth-child(3) { animation-delay: 120ms !important; }
+@keyframes onda { from { transform: scaleY(0.4); } to { transform: scaleY(1); } }
+.sem-haptica-visivel .haptica { display: none; }
+
+/* ---------- Início no aparelho (desbloqueia som e vibração) ---------- */
+.inicio {
+  position: absolute; inset: 0; z-index: 20; background: var(--fundo-padrao);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 32px; text-align: center;
+}
+.inicio .papel { font-size: 13px; font-weight: 600; color: var(--texto-secundario); letter-spacing: 0.04em; text-transform: uppercase; }
+
+/* ---------- Movimento reduzido: troca deslocamento por esmaecimento ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .tela { transform: none !important; }
+  .busca .anel { animation: none; opacity: 0.15; transform: scale(calc(0.45 + var(--i, 0) * 0.25)); }
+  .busca .anel:nth-child(2) { --i: 1; } .busca .anel:nth-child(3) { --i: 2; }
+  .busca .nucleo { animation: respira 2s ease-in-out infinite; }
+  @keyframes respira { 50% { opacity: 0.6; } }
+  .trilho .rastro svg { animation: none; opacity: 0.4; }
+  .brilho.acende { animation-name: brilho-fade; }
+  @keyframes brilho-fade { 0%, 100% { opacity: 0; } 30% { opacity: 0.8; } }
+  .encostando .aparelho-demo { transform: none !important; }
+}
+
+/* no aparelho não há barra de status desenhada: o aviso de vibração vai para o lado direito do app bar, que fica vazio */
+.modo-aparelho .haptica { left: auto; right: 16px; top: calc(env(safe-area-inset-top, 0px) + 14px); transform: translateY(-6px) scale(0.96); }
+.modo-aparelho .haptica.mostra { transform: none; }
+.modo-aparelho .haptica .prefixo { display: none; }
+
+/* ---------- Encontrou: o centro do radar vira o avatar de quem foi tocado ---------- */
+.nucleo { overflow: hidden; transition: transform 180ms var(--ease-out); }
+.nucleo-icone, .nucleo-avatar { position: absolute; inset: 0; display: grid; place-items: center; transition: opacity 150ms ease, filter 150ms ease; }
+.nucleo-avatar { opacity: 0; font-size: 20px; font-weight: 600; color: var(--texto-acao); }
+.busca.encontrou .anel { animation: none; opacity: 0; transition: opacity 150ms ease; }
+.busca.encontrou .nucleo { transform: scale(1.06); }
+.busca.encontrou .nucleo-icone { opacity: 0; filter: blur(2px); }
+.busca.encontrou .nucleo-avatar { opacity: 1; }
+.avatar-voo {
+  position: absolute; left: 0; top: 0; z-index: 6; border-radius: 50%; pointer-events: none;
+  background: var(--acao-secundaria); color: var(--texto-acao); font-size: 20px; font-weight: 600;
+  display: grid; place-items: center; transform-origin: 0 0; will-change: transform;
+}
+
+/* a tela que sai some mais rápido do que a que entra (menos sobreposição entre as duas) */
+.tela:not(.ativa) { transition-duration: 140ms; }
+
+/* estado do sensor de batida (some sozinho) e leitura para calibrar (?debug=1) */
+.estado-sensor {
+  position: absolute; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 4px); transform: translateX(-50%);
+  font-size: 11px; color: var(--texto-secundario); white-space: nowrap; z-index: 15; pointer-events: none;
+  animation: some 4s 2s forwards;
+}
+.estado-sensor.debug { bottom: auto; top: calc(env(safe-area-inset-top, 0px) + 60px); animation: none; background: rgba(0,0,0,0.75); color: #fff; padding: 4px 8px; border-radius: 8px; }
+@keyframes some { to { opacity: 0; } }
+
+/* ---------- Tela cheia em cor (D-008 revisada, 21/10): identidade, valor grande e confirmação por segunda aproximação ---------- */
+:root { --cor-paga: #3840e0; --cor-recebe: #1d2287; }
+.barra-status { position: absolute; top: 0; left: 0; right: 0; z-index: 8; transition: color 200ms ease; }
+.celular[data-cor] .barra-status { color: #fff; }
+.celular[data-cor] .barra-status .icones i { background: #fff; }
+.tela.tela-cor { inset: 0; padding-top: 32px; color: #fff; }
+.modo-aparelho .tela.tela-cor { padding-top: env(safe-area-inset-top, 0); }
+.cor-paga { background: var(--cor-paga); }
+.cor-recebe { background: var(--cor-recebe); }
+.appbar.claro .icone-botao { background: rgba(255, 255, 255, 0.16); color: #fff; }
+.suave { color: rgba(255, 255, 255, 0.76); }
+.cartao.claro { border-color: rgba(255, 255, 255, 0.2); background: rgba(255, 255, 255, 0.08); }
+.cartao.claro .legenda { color: rgba(255, 255, 255, 0.76); }
+
+.bloco-valor { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 4px; padding: 0 16px; }
+.frase-valor { font-size: 22px; line-height: 28px; margin: 0; color: rgba(255, 255, 255, 0.9); text-wrap: balance; }
+.valor-xl {
+  margin: 0; display: flex; align-items: flex-start; gap: 6px;
+  font-size: 72px; line-height: 80px; font-weight: 700; letter-spacing: -0.03em; font-variant-numeric: tabular-nums;
+}
+.valor-xl .moeda { font-size: 24px; line-height: 24px; font-weight: 600; margin-top: 14px; letter-spacing: 0; }
+.estado-valor {
+  margin: 12px 0 0; padding: 8px 16px; border-radius: 20px; background: rgba(255, 255, 255, 0.14);
+  font-size: 15px; line-height: 20px; font-weight: 600;
+}
+.titulo-xl { margin: 4px 0 0; font-size: 44px; line-height: 48px; font-weight: 700; letter-spacing: -0.02em; }
+.check-claro {
+  width: 72px; height: 72px; border-radius: 50%; background: #fff; color: var(--sucesso);
+  display: grid; place-items: center; margin-bottom: 8px;
+}
+.check-claro svg { width: 34px; height: 34px; }
+.check-claro path { stroke-dasharray: 30; stroke-dashoffset: 30; }
+.tela.ativa .check-claro { animation: aparece 300ms var(--ease-out); }
+.tela.ativa .check-claro path { animation: desenha 260ms 60ms var(--ease-out) forwards; }
+
+.botao.sobre-cor { background: #fff; color: var(--cor-paga); }
+.cor-recebe .botao.sobre-cor { color: var(--cor-recebe); }
+.botao.sobre-cor-sec { background: rgba(255, 255, 255, 0.14); color: #fff; }
+.botao.texto.claro { color: #fff; }
+.aviso-claro {
+  display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: var(--raio-md);
+  background: rgba(255, 255, 255, 0.1); color: #fff;
+}
+.aviso-claro svg { flex: none; width: 20px; height: 20px; }
+.aviso-claro .legenda { color: rgba(255, 255, 255, 0.9); }
+.particula { position: absolute; z-index: 9; pointer-events: none; }
+
+/* ---------- v2 (23/11/2026): opções de confirmação B e D, motion dos itens 1 a 3 e correções da auditoria ---------- */
+
+/* modo demonstração: seletor da opção de confirmação */
+.opcoes { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.opcoes-rotulo { font-size: 13px; font-weight: 600; color: var(--texto-secundario); margin-right: 4px; }
+.opcao {
+  height: 36px; padding: 0 14px; border-radius: 18px; display: inline-flex; align-items: center;
+  font-size: 14px; font-weight: 600; text-decoration: none; color: var(--texto-principal);
+  background: var(--fundo-padrao); box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+  transition: transform var(--motion-rapido) var(--ease-out);
+}
+.opcao:active { transform: scale(0.97); }
+.opcao[aria-current="true"] { background: var(--acao-principal); color: var(--texto-sobre-acao); box-shadow: none; }
+
+/* o tempo só aparece nos últimos 10 s; estados vazios guardam o espaço para nada pular */
+.timer.oculto, .estado-valor.oculto { visibility: hidden; }
+
+/* marca Pix nas telas em que o dinheiro se move (Manual da Marca Pix, p. 37) */
+.marca-pix { font-weight: 700; }
+
+/* contraste do CPF: 4,19:1 na v1, acima de 7:1 agora (auditoria, item 4) */
+.cartao.claro .legenda { color: rgba(255, 255, 255, 0.92); }
+
+/* B: tocar e segurar "Pagar"; o preenchimento é o próprio feedback (0,8 s, linear), soltar volta em 200 ms */
+.dica { margin-bottom: 4px; }
+.segurar-pagar { position: relative; overflow: hidden; height: 56px; border-radius: 28px; touch-action: none; }
+.segurar-pagar .segurar {
+  position: absolute; inset: 0; background: rgba(56, 64, 224, 0.18);
+  clip-path: inset(0 100% 0 0); transition: clip-path 200ms var(--ease-out);
+}
+.segurar-pagar.segurando .segurar { clip-path: inset(0 0 0 0); transition: clip-path 800ms linear; }
+.segurar-pagar .rotulo-botao { position: relative; }
+.segurar-pagar:focus-visible { outline: 3px solid rgba(255, 255, 255, 0.7); outline-offset: 3px; }
+
+/* D: barra "mantenha perto", a mesma nos dois celulares */
+.estado-valor { position: relative; overflow: hidden; }
+.estado-valor .preenche {
+  position: absolute; inset: 0; background: rgba(255, 255, 255, 0.24);
+  transform: scaleX(0); transform-origin: left center; pointer-events: none;
+}
+.estado-valor [data-estado] { position: relative; }
+
+/* motion, item 3: a busca se fecha na pessoa (anéis encolhem até o centro) e o avatar entra com uma mola leve */
+.busca.encontrou .anel {
+  animation: none; opacity: 0; transform: scale(0.4);
+  transition: opacity 250ms var(--ease-in-out), transform 250ms var(--ease-in-out);
+}
+.busca.encontrou .anel:nth-child(2) { transition-delay: 30ms; }
+.busca.encontrou .anel:nth-child(3) { transition-delay: 60ms; }
+.busca.encontrou .nucleo { transition: none; animation: encontra 360ms var(--ease-out); }
+@keyframes encontra {
+  0% { transform: scale(0.92); }
+  60% { transform: scale(1.1); }
+  100% { transform: scale(1.06); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .busca.encontrou .nucleo { animation: none; }
+}
+
+/* ---------- v2 (25/11/2026), direção A: "luz na borda", lado a lado ----------
+   O momento novo ganha um ambiente escuro próprio; a base do Mercado Pago (tipografia, botões, copy) continua.
+   A luz acende na borda de dentro, onde o outro celular está, e cresce com a proximidade (--perto, 0 a 1).
+   Nunca topo com topo: no iPhone, o topo abre o NameDrop. */
+:root {
+  --noite: #070a26;
+  --noite-indigo: #141a7a;
+  --luz-indigo: #8f97ff;
+  --noite-recebe: #051428;
+  --recebe-escuro: #0a3a6b;
+  --luz-recebe: #7cd3ff;
+  --recebe-texto: #0a4f8f;
+}
+.celular { background: var(--noite); color: #fff; }
+.celular .barra-status { color: #fff; }
+.celular .barra-status .icones i { background: #fff; }
+
+/* fundo: a cor nasce da borda de dentro */
+.tela-noite { inset: 0; padding-top: 32px; color: #fff; overflow: hidden; }
+.modo-aparelho .tela-noite { padding-top: env(safe-area-inset-top, 0); }
+.celular[data-lado="direita"] .tela-noite { background: radial-gradient(85% 60% at 112% 50%, #262db0 0%, #10156a 42%, var(--noite) 80%); }
+.celular[data-lado="esquerda"] .tela-noite { background: radial-gradient(85% 60% at -12% 50%, #262db0 0%, #10156a 42%, var(--noite) 80%); }
+.tela-noite > :not(.luz-borda):not(.fantasma) { position: relative; z-index: 2; }
+
+/* luz da borda: respira sozinha (procurando) e cresce com a proximidade */
+.luz-borda {
+  position: absolute; top: 50%; width: 220px; height: 620px; margin-top: -310px; z-index: 1; pointer-events: none;
+  border-radius: 50%; filter: blur(10px);
+  background: radial-gradient(closest-side, rgba(170, 178, 255, 0.95), rgba(110, 120, 255, 0.5) 45%, transparent 78%);
+  opacity: calc(0.35 + var(--perto, 0) * 0.65);
+  transform: scaleX(calc(0.55 + var(--perto, 0) * 0.7));
+}
+.celular[data-lado="direita"] .luz-borda { right: -130px; transform-origin: right center; }
+.celular[data-lado="esquerda"] .luz-borda { left: -130px; transform-origin: left center; }
+.luz-borda::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: inherit; animation: respira-luz 2.4s var(--ease-in-out) infinite; }
+@keyframes respira-luz { 0%, 100% { opacity: 0; } 50% { opacity: 0.5; } }
+
+/* contorno do outro celular entrando pela borda de dentro */
+.fantasma {
+  position: absolute; top: 50%; width: 150px; height: 320px; margin-top: -170px; z-index: 1; pointer-events: none;
+  border-radius: 30px; border: 1.5px solid rgba(200, 205, 255, calc(0.25 + var(--perto, 0) * 0.6));
+  background: linear-gradient(to var(--para-dentro, left), rgba(130, 140, 255, 0.18), rgba(130, 140, 255, 0));
+}
+.celular[data-lado="direita"] .fantasma { right: 0; --para-dentro: left; transform: translateX(calc(100% - var(--perto, 0) * 38%)); }
+.celular[data-lado="esquerda"] .fantasma { left: 0; --para-dentro: right; transform: translateX(calc(-100% + var(--perto, 0) * 38%)); }
+
+/* o radar sai; fica um núcleo de vidro que vira a pessoa encontrada */
+.tela-noite .busca { width: 160px; height: 160px; margin: 0 auto; }
+.tela-noite .busca .anel { display: none; }
+.tela-noite .busca .nucleo {
+  width: 88px; height: 88px; background: rgba(255, 255, 255, 0.08); color: #c9ceff;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16), 0 0 calc(20px + var(--perto, 0) * 40px) rgba(120, 130, 255, calc(0.15 + var(--perto, 0) * 0.4));
+}
+.tela-noite .nucleo-avatar { background: #fff; color: var(--cor-paga); font-size: 24px; }
+.celular[data-papel="cristina"] .tela-noite .nucleo-avatar { color: var(--recebe-texto); }
+.avatar-voo { background: #fff; color: var(--cor-paga); font-size: 24px; }
+.celular[data-papel="cristina"] .avatar-voo { color: var(--recebe-texto); }
+
+/* texto da busca embaixo, perto do polegar e longe da luz */
+.texto-busca { gap: 10px; padding-bottom: 8px; }
+.tela-noite .titulo-g { font-size: 26px; line-height: 32px; }
+.tela-noite .corpo.sec, .tela-noite .legenda.sec { color: rgba(255, 255, 255, 0.72); }
+.tela-noite .chip-ok { background: rgba(255, 255, 255, 0.1); color: #dfe2ff; }
+.tela-noite .chip-ok svg { color: var(--luz-recebe); }
+.guia { display: flex; align-items: center; gap: 12px; margin-top: 6px; padding: 10px 12px; border-radius: var(--raio-md); background: rgba(255, 255, 255, 0.07); }
+.guia-picto { flex: none; color: rgba(255, 255, 255, 0.85); }
+.guia .legenda { color: rgba(255, 255, 255, 0.86); }
+.tela-noite .botao.sobre-cor-sec { background: rgba(255, 255, 255, 0.12); color: #fff; }
+
+/* confirmação e sucesso: mesma linguagem, luz vinda da borda de dentro */
+.celular[data-lado="direita"] .tela-cor.cor-paga { background: radial-gradient(95% 65% at 112% 45%, #3b43e6 0%, #1a2190 40%, #0b0f45 85%); }
+.celular[data-lado="esquerda"] .tela-cor.cor-paga { background: radial-gradient(95% 65% at -12% 45%, #3b43e6 0%, #1a2190 40%, #0b0f45 85%); }
+.celular[data-lado="esquerda"] .tela-cor.cor-recebe { background: radial-gradient(95% 65% at -12% 45%, #1a8fe0 0%, #0b4383 42%, var(--noite-recebe) 85%); }
+.celular[data-lado="direita"] .tela-cor.cor-recebe { background: radial-gradient(95% 65% at 112% 45%, #1a8fe0 0%, #0b4383 42%, var(--noite-recebe) 85%); }
+.cor-recebe .botao.sobre-cor { color: var(--recebe-texto); }
+.cor-recebe .check-claro { color: var(--recebe-texto); }
+
+/* identidade no centro, com o avatar grande: é a pessoa, não um item de lista */
+.tela-cor .cartao.claro {
+  flex-direction: column; text-align: center; gap: 10px; border: 0; background: none; padding: 0; margin-top: 16px;
+}
+.tela-cor .cartao.claro .avatar {
+  width: 80px; height: 80px; font-size: 24px; background: #fff; color: var(--cor-paga);
+  box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.1), 0 0 48px 6px rgba(140, 150, 255, 0.45);
+}
+.cor-recebe .cartao.claro .avatar { color: var(--recebe-texto); box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.1), 0 0 48px 6px rgba(90, 190, 255, 0.45); }
+.tela-cor .cartao.claro .nome { font-size: 22px; line-height: 28px; font-weight: 700; letter-spacing: -0.01em; }
+.tela-cor .conteudo > .corpo.suave { text-align: center; }
+
+/* brilho da conexão: na borda de dentro, na vertical */
+.celular[data-lado] .brilho { top: 50%; width: 160px; height: 520px; margin: -260px 0 0 0; left: auto; right: auto; transform: scaleY(0.5); }
+.celular[data-lado="direita"] .brilho { right: -80px; }
+.celular[data-lado="esquerda"] .brilho { left: -80px; }
+.celular[data-lado] .brilho {
+  background: radial-gradient(ellipse at center, rgba(190, 196, 255, 0.95), rgba(124, 211, 255, 0.35) 45%, transparent 72%);
+}
+.celular[data-lado] .brilho.acende { animation: brilho-lado 900ms var(--ease-out); }
+@keyframes brilho-lado {
+  0% { opacity: 0; transform: scaleY(0.5); }
+  25% { opacity: 1; transform: scaleY(1); }
+  100% { opacity: 0; transform: scaleY(1.2); }
+}
+
+/* palco: os celulares começam afastados; arrastar aproxima */
+.dupla { touch-action: none; }
+.dupla .moldura { cursor: grab; }
+.dupla.arrastando .moldura { cursor: grabbing; }
+.dica-palco { align-self: center; font-size: 13px; color: var(--texto-secundario); }
+.inicio { background: var(--noite); color: #fff; }
+.inicio .papel, .inicio .corpo.sec { color: rgba(255, 255, 255, 0.72); }
+
+@media (prefers-reduced-motion: reduce) {
+  .luz-borda::after { animation: none; }
+  .celular[data-lado] .brilho.acende { animation-name: brilho-fade; }
+}
+
+/* quem recebe fica no azul-claro desde a busca: a cor do papel aparece antes do dinheiro (Adriano, 25/11: sem verde, fora da paleta do Mercado Pago) */
+.celular[data-papel="cristina"][data-lado="esquerda"] .tela-noite { background: radial-gradient(85% 60% at -12% 50%, #1777c9 0%, #0a3a6b 42%, var(--noite-recebe) 80%); }
+.celular[data-papel="cristina"][data-lado="direita"] .tela-noite { background: radial-gradient(85% 60% at 112% 50%, #1777c9 0%, #0a3a6b 42%, var(--noite-recebe) 80%); }
+.celular[data-papel="cristina"] .luz-borda { background: radial-gradient(closest-side, rgba(170, 225, 255, 0.95), rgba(90, 180, 255, 0.5) 45%, transparent 78%); }
+.celular[data-papel="cristina"] .fantasma { border-color: rgba(190, 230, 255, calc(0.25 + var(--perto, 0) * 0.6)); }
+.celular[data-papel="cristina"] .tela-noite .busca .nucleo { color: #bfe6ff; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16), 0 0 calc(20px + var(--perto, 0) * 40px) rgba(90, 180, 255, calc(0.15 + var(--perto, 0) * 0.4)); }
+.celular[data-papel="cristina"] .guia-picto rect:last-child { fill: var(--luz-recebe); }
+
+/* ---------- v2: a luz segue a direção real do outro celular (25/11) ----------
+   --lx/--ly: ponto da borda que aponta para o outro; --ang: direção; --gx/--gy: centro do fundo;
+   --fx/--fy: centro do contorno do outro celular. Calculados no JS (posicionar). */
+.celular[data-lado] .luz-borda {
+  left: var(--lx, 100%); top: var(--ly, 50%); right: auto; margin: 0;
+  translate: -50% -50%; rotate: var(--ang, 0deg); transform-origin: center;
+  transform: scaleX(calc(0.55 + var(--perto, 0) * 0.7));
+}
+.celular[data-lado] .fantasma {
+  left: var(--fx, 120%); top: var(--fy, 50%); right: auto; margin: 0;
+  transform: translate(-50%, -50%);
+}
+.celular[data-lado] .brilho {
+  left: var(--lx, 100%); top: var(--ly, 50%); right: auto; margin: 0;
+  translate: -50% -50%; rotate: var(--ang, 0deg);
+}
+.celular[data-lado] .tela-noite { background: radial-gradient(circle at var(--gx, 110%) var(--gy, 50%), #262db0 0px, #10156a 240px, var(--noite) 560px); }
+.celular[data-papel="cristina"][data-lado] .tela-noite { background: radial-gradient(circle at var(--gx, -10%) var(--gy, 50%), #1777c9 0px, #0a3a6b 240px, var(--noite-recebe) 560px); }
+.celular[data-lado] .tela-cor.cor-paga { background: radial-gradient(circle at var(--gx, 110%) var(--gy, 45%), #3b43e6 0px, #1a2190 260px, #0b0f45 640px); }
+.celular[data-lado] .tela-cor.cor-recebe { background: radial-gradient(circle at var(--gx, -10%) var(--gy, 45%), #1a8fe0 0px, #0b4383 260px, var(--noite-recebe) 640px); }
+
+/* ---------- v2: níveis de aparelho (25/11) ----------
+   Sem direção, a luz não tem lado: contorna a tela inteira. Só distância: cresce em 4 níveis, com transição,
+   para o sinal oscilante do Bluetooth não virar uma luz piscando. Só contato: nada antes do toque, e um clarão na conexão. */
+.aura { display: none; }
+.celular:not([data-nivel="direcao"]) .luz-borda,
+.celular:not([data-nivel="direcao"]) .fantasma { display: none; }
+.celular:not([data-nivel="direcao"]) .aura {
+  display: block; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  box-shadow: inset 0 0 calc(24px + var(--aura, 0) * 80px) calc(var(--aura, 0) * 22px) rgba(150, 160, 255, calc(0.18 + var(--aura, 0) * 0.62));
+  transition: box-shadow 320ms var(--ease-out);
+}
+.celular[data-nivel="distancia"] .aura { animation: respira-aura 2.4s var(--ease-in-out) infinite; }
+@keyframes respira-aura { 0%, 100% { opacity: 0.75; } 50% { opacity: 1; } }
+.celular[data-nivel="contato"] .aura { box-shadow: none; }
+.celular[data-papel="cristina"]:not([data-nivel="direcao"]) .aura {
+  box-shadow: inset 0 0 calc(24px + var(--aura, 0) * 80px) calc(var(--aura, 0) * 22px) rgba(110, 195, 255, calc(0.18 + var(--aura, 0) * 0.62));
+}
+.celular[data-papel="cristina"][data-nivel="contato"] .aura { box-shadow: none; }
+.celular:not([data-nivel="direcao"]) .tela-noite .busca .nucleo {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16), 0 0 calc(20px + var(--aura, 0) * 40px) rgba(120, 130, 255, calc(0.15 + var(--aura, 0) * 0.4));
+}
+/* clarão da conexão na tela inteira */
+.celular[data-lado]:not([data-nivel="direcao"]) .brilho {
+  left: 0; top: 0; width: 100%; height: 100%; translate: none; rotate: none; margin: 0; filter: none;
+  background: none; border-radius: inherit; box-shadow: inset 0 0 90px 26px rgba(180, 188, 255, 0.95);
+}
+.celular[data-papel="cristina"]:not([data-nivel="direcao"]) .brilho { box-shadow: inset 0 0 90px 26px rgba(150, 215, 255, 0.95); }
+.celular[data-lado]:not([data-nivel="direcao"]) .brilho.acende { animation: brilho-tela 900ms var(--ease-out); }
+@keyframes brilho-tela { 0%, 100% { opacity: 0; } 25% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .celular[data-nivel="distancia"] .aura { animation: none; } }
+
+/* captura de tela parada para o vídeo das mãos */
+.modo-captura .celular { width: 360px; height: 818px; zoom: 1.5; }
+.modo-captura { background: var(--noite); }
+.modo-captura .luz-borda::after { animation: none; }
+.sem-fantasma .fantasma { display: none; }
