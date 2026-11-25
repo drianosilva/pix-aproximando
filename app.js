@@ -514,7 +514,8 @@
       timerSeg = 58;
       const t = $('[data-timer]');
       clearInterval(relogio);
-      if (t) {
+      // no modo demonstração o contador não roda: sem o estado "autorização expirada", um 0:00 parado parece defeito
+      if (t && MODO !== 'demo') {
         // v2: o tempo só aparece nos últimos 10 s (um cronômetro fixo põe pressão onde a atenção é na outra pessoa)
         t.textContent = 'Válido por 0:58';
         t.classList.add('oculto');
