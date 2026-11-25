@@ -605,3 +605,12 @@ button { font: inherit; color: inherit; border: 0; background: none; padding: 0;
 .modo-captura .tela.tela-cor, .modo-captura .tela.tela-noite { inset: 0; padding-top: 50px; }
 .modo-demo .rodape, .modo-captura .rodape { padding-bottom: 50px; }
 .modo-aparelho .indicador-home, .modo-aparelho .ilha { display: none; }
+
+/* barra de status mais baixa (Adriano, 25/11): ilha a 14 px do topo, hora e ícones no centro da ilha.
+   No vídeo, a composição amplia a tela em 2% e corta uns 8 px de cima; com 14 px, a ilha fica perto dos 11 pt do iPhone. */
+.barra-status { height: 60px; align-items: flex-start; padding-top: 14px; }
+.barra-status .orelha { height: 33px; padding-top: 0; }
+.barra-status .ilha { margin-top: 0; }
+.modo-demo .tela, .modo-captura .tela { inset: 60px 0 0 0; }
+.modo-demo .tela.tela-cor, .modo-demo .tela.tela-noite,
+.modo-captura .tela.tela-cor, .modo-captura .tela.tela-noite { inset: 0; padding-top: 60px; }
