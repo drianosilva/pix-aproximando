@@ -123,6 +123,8 @@ button { font: inherit; color: inherit; border: 0; background: none; padding: 0;
   background: var(--info-fundo); font-size: 12px; font-weight: 600;
 }
 .chip-ok svg { color: var(--sucesso); }
+/* v2 (25/11): o selo de antes de aproximar diz que o valor foi confirmado, não que o Pix saiu; escudo em vez do check verde */
+.chip-valor svg { color: currentColor; }
 .timer { font-variant-numeric: tabular-nums; }
 
 .botao {

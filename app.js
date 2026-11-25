@@ -51,6 +51,7 @@
     voltar: svg('<path d="M4 12h15"/><path d="M10 6 4 12l6 6"/>', 20),
     fechar: svg('<path d="m8 8 8 8"/><path d="m16 8-8 8"/>', 20),
     check: svg('<path d="M20 6.5 9 17.5l-5-5"/>', 16, 2),
+    escudo: svg('<path d="M15.32 10.34 11.17 14.49 8.68 12"/><path d="M20 13a8 8 0 0 1-16 0V6.91c0-.51.39-.95.9-.99a12.7 12.7 0 0 0 6.46-2.69.98.98 0 0 1 1.28 0 12.7 12.7 0 0 0 6.46 2.69c.51.04.9.48.9.99V13Z"/>', 16),
     aproximacao: svg('<path d="M9 7.24a4.24 4.24 0 0 1 6 0"/><path d="M5.63 17.37a9 9 0 1 1 12.74 0"/><path d="M10.5 9.62a2.12 2.12 0 0 1 3 0"/><path d="M11.25 19.75h1.5"/><rect x="8.5" y="13" width="7" height="9" rx="1.8"/>', 32),
     setaCima: svg('<path d="M12 19V5"/><path d="m6 11 6-6 6 6"/>', 20, 2),
     chevron: svg('<path d="m6 15 6-6 6 6"/>', 24),
@@ -310,7 +311,7 @@
         <header class="appbar claro"><button class="icone-botao" aria-label="Voltar">${ICONE.voltar}</button><span>Pagar por aproximação</span></header>
         <div class="conteudo">
           <div class="status-linha">
-            <span class="chip-ok">${ICONE.check} Pix de ${VALOR} autorizado</span>
+            <span class="chip-ok chip-valor">${ICONE.escudo} Valor confirmado com biometria</span>
             <span class="legenda sec timer oculto" data-timer>Válido por 0:58</span>
           </div>
         </div>
@@ -805,7 +806,7 @@
   // ?captura=antonio|cristina&tela=busca|ver|sucesso&perto=0..1&segurar=0..1
   if (params.get('captura')) {
     document.body.classList.add('modo-captura', 'sem-haptica-visivel');
-    if (params.get('fantasma') === '0') document.body.classList.add('sem-fantasma'); // no vídeo, o celular de verdade já está ao lado
+    if (params.get('fantasma') === '0') document.body.classList.add('sem-fantasma'); // no vídeo, o outro celular já aparece na filmagem
     const papelCap = params.get('captura') === 'cristina' ? 'cristina' : 'antonio';
     const cel = criarCelular(papelCap);
     app.appendChild(cel.el);
