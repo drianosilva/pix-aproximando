@@ -585,3 +585,23 @@ button { font: inherit; color: inherit; border: 0; background: none; padding: 0;
 .modo-captura { background: var(--noite); }
 .modo-captura .luz-borda::after { animation: none; }
 .sem-fantasma .fantasma { display: none; }
+
+/* ---------- Barra de status e base no desenho do iPhone (modo demonstração e vídeo, 25/11) ----------
+   Hora centralizada na área à esquerda da Dynamic Island, ícones do sistema à direita, longe dos cantos arredondados.
+   Embaixo, os botões ficam acima do indicador de início (34 pt de área segura no iPhone). */
+.barra-status { height: 50px; padding: 0; display: flex; align-items: center; justify-content: space-between; }
+.barra-status .orelha { flex: 1; display: flex; justify-content: center; align-items: center; padding-top: 2px; }
+.barra-status .hora { font-family: -apple-system, 'SF Pro Text', system-ui, sans-serif; font-size: 16px; font-weight: 600; letter-spacing: -0.01em; }
+.barra-status .ilha { flex: none; width: 112px; height: 33px; border-radius: 17px; background: #000; margin-top: 2px; }
+.icones-ios { display: inline-flex; align-items: center; gap: 6px; color: currentColor; }
+.icones-ios svg { display: block; }
+.indicador-home { display: none; }
+.modo-demo .indicador-home, .modo-captura .indicador-home {
+  display: block; position: absolute; left: 50%; bottom: 8px; width: 128px; height: 5px; margin-left: -64px;
+  border-radius: 3px; background: rgba(255, 255, 255, 0.9); z-index: 8; pointer-events: none;
+}
+.modo-demo .tela, .modo-captura .tela { inset: 50px 0 0 0; }
+.modo-demo .tela.tela-cor, .modo-demo .tela.tela-noite,
+.modo-captura .tela.tela-cor, .modo-captura .tela.tela-noite { inset: 0; padding-top: 50px; }
+.modo-demo .rodape, .modo-captura .rodape { padding-bottom: 50px; }
+.modo-aparelho .indicador-home, .modo-aparelho .ilha { display: none; }

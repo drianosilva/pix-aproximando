@@ -38,6 +38,12 @@
   };
   const VALOR = 'R$ 50,00';
 
+  // ---------- Barra de status do iOS (modo demonstração e vídeo): sinal, Wi-Fi e bateria no desenho do sistema ----------
+  const ICONES_IOS = `
+    <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="7.5" width="3.2" height="4.5" rx="1"/><rect x="4.8" y="5.2" width="3.2" height="6.8" rx="1"/><rect x="9.6" y="2.7" width="3.2" height="9.3" rx="1"/><rect x="14.4" y="0" width="3.2" height="12" rx="1"/></svg>
+    <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><path d="M8 2.4c2.3 0 4.4.9 6 2.4l1.2-1.2A10.2 10.2 0 0 0 8 .7C5.2.7 2.7 1.8.8 3.6L2 4.8a8.5 8.5 0 0 1 6-2.4Z"/><path d="M8 5.8c1.4 0 2.6.5 3.6 1.4l1.2-1.2A6.8 6.8 0 0 0 8 4.1 6.8 6.8 0 0 0 3.2 6l1.2 1.2c1-.9 2.2-1.4 3.6-1.4Z"/><path d="M8 9.2c.5 0 .9.2 1.2.5L8 11.6 6.8 9.7c.3-.3.7-.5 1.2-.5Z"/></svg>
+    <svg width="27" height="13" viewBox="0 0 27 13" fill="none"><rect x=".5" y=".5" width="23" height="12" rx="3.8" stroke="currentColor" stroke-opacity=".35"/><rect x="2" y="2" width="20" height="9" rx="2.5" fill="currentColor"/><path d="M25 4.5v4c.8-.3 1.4-1.1 1.4-2s-.6-1.7-1.4-2Z" fill="currentColor" fill-opacity=".4"/></svg>`;
+
   // ---------- Ícones (mesmo desenho do pacote Line Icons do Figma, traço 1,5) ----------
   const svg = (d, s = 24, w = 1.5) =>
     `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
@@ -384,7 +390,12 @@
       </section>`;
 
     el.innerHTML = `
-      <div class="barra-status"><span data-relogio>${horaAgora()}</span><span class="icones"><i></i><i></i><i></i></span></div>
+      <div class="barra-status">
+        <span class="orelha"><span class="hora" data-relogio>${horaAgora()}</span></span>
+        <span class="ilha" aria-hidden="true"></span>
+        <span class="orelha"><span class="icones-ios" aria-hidden="true">${ICONES_IOS}</span></span>
+      </div>
+      <div class="indicador-home" aria-hidden="true"></div>
       <div class="brilho" data-brilho></div>
       <div class="haptica" data-haptica><span class="ondas"><i></i><i></i><i></i></span><span data-haptica-rotulo></span></div>
       ${telaBusca}${telaVer}${telaSucesso}`;
