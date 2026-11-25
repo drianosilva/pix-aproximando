@@ -309,7 +309,7 @@
             <span class="legenda sec timer oculto" data-timer>Válido por 0:58</span>
           </div>
         </div>
-        <div class="centro-busca">${NUCLEO}<p class="valor-busca"><span class="moeda">R$</span> 50,00</p></div>
+        <div class="centro-busca">${NUCLEO}<p class="valor-busca"><span class="moeda">R$</span>50,00</p></div>
         <div class="espaco"></div>
         <div class="conteudo texto-busca">
           <h1 class="titulo-g">${TXT.tituloPaga}</h1>

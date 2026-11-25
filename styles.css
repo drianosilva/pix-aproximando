@@ -658,3 +658,11 @@ button { font: inherit; color: inherit; border: 0; background: none; padding: 0;
 .celular[data-papel][data-nivel="contato"]:not([data-nivel="direcao"]) .aura { box-shadow: none; }
 /* aviso de vibração abaixo da Dynamic Island no modo demonstração */
 .modo-demo .haptica { top: 54px; }
+
+/* o valor é o mesmo objeto da busca à confirmação: um tamanho só, 44 px (Adriano, 25/11).
+   Na confirmação, fica um pouco abaixo do nome, que é o primeiro a conferir. */
+.valor-busca, [data-tela="ver"] .valor-xl { font-size: 44px; line-height: 52px; font-weight: 700; letter-spacing: -0.03em; }
+.valor-busca .moeda, [data-tela="ver"] .valor-xl .moeda { font-size: 18px; line-height: 18px; font-weight: 600; opacity: 0.85; }
+.valor-busca { display: flex; align-items: flex-start; gap: 5px; }
+.valor-busca .moeda { margin-top: 9px; vertical-align: 0; }
+[data-tela="ver"] .valor-xl .moeda { margin-top: 9px; }
