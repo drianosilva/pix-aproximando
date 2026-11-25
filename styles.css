@@ -673,3 +673,10 @@ button { font: inherit; color: inherit; border: 0; background: none; padding: 0;
   font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
   background: rgba(255, 255, 255, 0.16); color: #fff;
 }
+
+/* tipografia alinhada ao design system (Adriano, 25/11): valor e sucesso com 40/48 (Valor/Destaque e o novo Título/Destaque, mesmas medidas);
+   a frase de direção com 18/24 semibold (Título/Pequeno) */
+.valor-busca, [data-tela="ver"] .valor-xl { font-size: 40px; line-height: 48px; }
+.valor-busca .moeda, [data-tela="ver"] .valor-xl .moeda { margin-top: 8px; }
+.titulo-xl { font-size: 40px; line-height: 48px; }
+[data-tela="ver"] .frase-valor { font-size: 18px; line-height: 24px; font-weight: 600; }
