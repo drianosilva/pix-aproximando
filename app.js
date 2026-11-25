@@ -215,7 +215,12 @@
     // Teste com pessoas (v2): &cenario=2 no celular de quem paga (nome neutro, porque a pessoa vê o endereço) mostra outra pessoa no lugar da Cristina,
     // para observar se quem paga confere o nome antes de segurar "Pagar". Só muda o que este celular mostra.
     const ERRADA = { nome: 'Carla', completo: 'Carla Souza', iniciais: 'CS', cpf: 'CPF ***.912.034-** · Banco Inter' };
-    const outro = papel === 'antonio' && params.get('cenario') === '2' ? ERRADA : PESSOAS[papel === 'antonio' ? 'cristina' : 'antonio'];
+    // B9 (revisora): quem recebe pode ser uma empresa. &recebe=empresa, no celular de quem paga, mostra o titular
+    // da conta como o Pix devolve (razão social e CNPJ), com a marca "Empresa". Dados fictícios.
+    const EMPRESA = { nome: 'Doces da Cris', completo: 'Doces da Cris Ltda', iniciais: 'DC', cpf: 'CNPJ 12.345.678/0001-90 · Mercado Pago', empresa: true };
+    const outro = papel === 'antonio' && params.get('cenario') === '2' ? ERRADA
+      : papel === 'antonio' && params.get('recebe') === 'empresa' ? EMPRESA
+      : PESSOAS[papel === 'antonio' ? 'cristina' : 'antonio'];
     const paga = papel === 'antonio';
     const el = document.createElement('div');
     el.className = 'celular';
@@ -335,7 +340,7 @@
     const cartao = `
       <div class="cartao claro entra" data-cartao>
         <span class="avatar" data-avatar-destino>${outro.iniciais}</span>
-        <div><div class="nome">${outro.completo}</div><div class="legenda">${outro.cpf}</div></div>
+        <div><div class="nome">${outro.completo}</div>${outro.empresa ? '<span class="tag-empresa">Empresa</span>' : ''}<div class="legenda">${outro.cpf}</div></div>
       </div>`;
 
     // Tela cheia em cor com a identidade e o valor grande. Como quem paga confirma depende da opção:
@@ -353,7 +358,7 @@
       <section class="tela tela-cor ${paga ? 'cor-paga' : 'cor-recebe'}" data-tela="ver" aria-label="${paga ? 'Confirmar o pagamento' : 'Quem está pagando'}">
         <header class="appbar claro"><button class="icone-botao" data-cancelar aria-label="Cancelar">${ICONE.fechar}</button><span><span class="marca-pix">Pix</span> · ${paga ? 'Pagar' : 'Receber'} por aproximação</span></header>
         <div class="conteudo">
-          <p class="corpo suave">${paga ? 'Confira se é a pessoa que está com você' : 'Confira quem está pagando'}</p>
+          <p class="corpo suave">${paga ? (outro.empresa ? 'Confira se é a empresa que vai receber' : 'Confira se é a pessoa que está com você') : 'Confira quem está pagando'}</p>
           ${cartao}
         </div>
         <div class="espaco"></div>
